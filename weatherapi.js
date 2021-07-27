@@ -18,6 +18,7 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
   console.log('Connected to the weatherAPI database.');
 });
 
+// get the api key, city, and url setup for openweathermap (our current data source for temperature)
 let apiKey = '92170456d98957d0386278d266fe5a9e';
 let city = argv.c || 'portland';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
@@ -29,7 +30,6 @@ request(url, function (err, response, body) {
     let weather = JSON.parse(body);
     let temp = `${weather.main.temp}` ;
     console.log(temp);
-    console.log(weather);
   }
 });
 
