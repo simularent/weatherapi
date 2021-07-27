@@ -15,7 +15,30 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
   if (err) {
     console.error(err.message);
   }
-  console.log('Connected to the weatherAPI database.');
+
+db.serialize(function() {
+  db.run("CREATE TABLE weather (date INT, loc TEXT, temp INT)");
+
+  var stmt = db.prepare("INSERT INTO weather VALUES (?,?,?)");
+  
+request(url, function (err, response, body) {
+  if(err){
+    console.log('error:', error);
+  } else {
+    let weather = JSON.parse(body);
+    let temp = `${weather.main.temp}` ;
+    var d = new Date();
+    var n = d.toLocaleTimeString();
+    console.log(temp);
+  }
+});
+
+  stmt.run(n, i, temp);
+  stmt.finalize();
+
+  db.each("SELECT date, loc, temp FROM weather", function(err, row) {
+      console.log("date : "+row.date, row.loc);
+  });
 });
 
 // get the api key, city, and url setup for openweathermap (our current data source for temperature)
@@ -24,13 +47,15 @@ let city = argv.c || 'portland';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
 
 request(url, function (err, response, body) {
-  if(err){
-    console.log('error:', error);
-  } else {
-    let weather = JSON.parse(body);
-    let temp = `${weather.main.temp}` ;
-    console.log(temp);
-  }
+	  if(err){
+		      console.log('error:', error);
+		    } else {
+			        let weather = JSON.parse(body);
+			        let temp = `${weather.main.temp}` ;
+			        var date = new Date();
+			        var ndate = date.toLocaleTimeString();
+			        console.log(temp);
+			      }
 });
 
 db.close((err) => {
