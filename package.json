@@ -1,0 +1,22 @@
+{
+  "name": "temp",
+  "version": "1.0.0",
+  "description": "nwea-weather-test",
+  "main": "weatherapi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified yet\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simularent/weatherapi.git"
+  },
+  "author": "brandon",
+  "license": "ISC",
+  "homepage": "https://github.com/simularent/weatherapi#readme",
+  "dependencies": {
+    "request": "^2.88.2",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2",
+    "yargs": "^17.0.1"
+  }
+}
