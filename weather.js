@@ -26,14 +26,16 @@ let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperi
 testdate();
 
 function testdate () {
-	db.each('SELECT temp, date FROM weather', function(err, row) {
-        console.log(row.temp, row.date);
+	console.log("Running testdate function");
+	console.log("Getting latest date");
+	db.each('SELECT date, city, temp, id FROM weather ORDER BY id DESC LIMIT 1', function(err, row) {
+        console.log(row.id);
  	var date = new Date();
 	//data from database
 		console.log("db: " + row.date)
 		console.log("current date: " + date)
 		
-		var FIVE_MIN=5*60*1000;
+		var FIVE_MIN=1*60*1000;
 		
 		if((date - new Date(row.date)) > FIVE_MIN) {
 		   runrequest();
@@ -63,12 +65,12 @@ function runrequest () {
 
 function DBinsert(temp, city, date) {
 	db.serialize
-	var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?)');
+	var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?)');
 		    stmt.run(temp,city,date);
 		    stmt.finalize();
-	//db.each('SELECT temp, city, date FROM weather', function(err, row) {
-	//	      console.log(row.temp, row.city, row.date);
-		  //});
+	db.each('SELECT temp, city, date, id FROM weather', function(err, row) {
+		    console.log(row.temp, row.city, row.date, row.id);
+	});
 };
 
 function DBclose() { 

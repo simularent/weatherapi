@@ -8,7 +8,10 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
 		    }
 	  console.log('Connected to the weatherAPI database.');
 	  db.serialize(() => {
-db.run('DROP TABLE IF EXISTS weather');
+		db.run('DROP TABLE IF EXISTS weather');
+		db.all("select name from sqlite_master where type='table'", function (err, tables) {
+		console.log(tables);
+		});
 		          });
 });
 

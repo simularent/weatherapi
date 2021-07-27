@@ -1,5 +1,17 @@
+// use request to pull data from the OpenWeather API
+const request = require('request');
+
+// use yargs to allow the user to manipulate our JS with arguments
+const argv = require('yargs').argv;
+
 // use sqlite3 as our backend db
 const sqlite3 = require('sqlite3').verbose();
+
+// get the api key, city, and url setup for openweathermap (our current data source for temperature)
+let apiKey = '92170456d98957d0386278d266fe5a9e';
+let city = argv.c || 'portland';
+let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
+
 
 // create and open the database
 let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -8,10 +20,44 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
 		    }
 	  console.log('Connected to the weatherAPI database.');
 	  db.serialize(() => {
-db.run('DROP TABLE IF EXISTS weather');
-db.run('CREATE TABLE IF NOT EXISTS weather (temp INT, city TEXT, date INT, id PRIMARY KEY)');
-		          });
+		db.run('CREATE TABLE weather (temp INT, city TEXT, date INT, id INTEGER PRIMARY KEY)');
+		db.all("select name from sqlite_master where type='table'", function (err, tables) {
+	        console.log(tables);
+	        });
+	  });
 });
+
+runrequest();
+
+function runrequest () {
+        request(url, function (err, response, body) {
+        if(err){
+        console.log('error:', error);
+        } else {
+                 let weather = JSON.parse(body);
+                 let temp = `${weather.main.temp}` ;
+                 let city = `${weather.name}` ;
+                 var date = new Date();
+                 var ndate = date.toLocaleTimeString();
+                 console.log(temp);
+                 console.log(city);
+                 console.log(ndate);
+                 console.log(date);
+                 DBinsert(temp, city, date);
+                 DBclose();
+            }
+	});
+};
+
+function DBinsert(temp, city, date) {
+	        db.serialize
+	        var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?)');
+	                    stmt.run(temp,city,date);
+	                    stmt.finalize();
+        db.each('SELECT temp, city, date, id FROM weather', function(err, row) {
+	        console.log(row.temp, row.city, row.date, row.id);
+	        });
+	};
 
 function DBclose() { 
 	db.close((err) => {
