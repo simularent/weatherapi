@@ -11,15 +11,11 @@ const argv = require('yargs').argv;
 const sqlite3 = require('sqlite3').verbose();
 
 // create and open the database
-let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE, (err) => {
 	  if (err) {
 		      console.error(err.message);
 		    }
 	  console.log('Connected to the weatherAPI database.');
-	  db.serialize(() => {
-//		          db.run('DROP TABLE IF EXISTS weather');
-		  	  db.run('CREATE TABLE IF NOT EXISTS weather (temp INT, city TEXT, date INT)');
-		          });
 });
 
 // get the api key, city, and url setup for openweathermap (our current data source for temperature)
@@ -28,12 +24,21 @@ let city = argv.c || 'portland';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
 
 testdate();
-runrequest();
 
 function testdate () {
-	db.each('SELECT temp, city, date FROM weather', function(err, row) {
-        console.log(row.temp, row.city, row.date);
-  });
+	db.each('SELECT temp, date FROM weather', function(err, row) {
+        console.log(row.temp, row.date);
+ 	var date = new Date();
+	//data from database
+		console.log("db: " + row.date)
+		console.log("current date: " + date)
+		
+		var FIVE_MIN=5*60*1000;
+		
+		if((date - new Date(row.date)) > FIVE_MIN) {
+		   runrequest();
+		}
+	});
 };
 
 function runrequest () {
@@ -49,19 +54,21 @@ function runrequest () {
 			        console.log(temp);
 			    	console.log(city);
 			    	console.log(ndate);
-			    	DBinsert(temp, city, ndate);
+			    	console.log(date);
+			    	DBinsert(temp, city, date);
 			    	DBclose();
 			      }
 });
 };
 
 function DBinsert(temp, city, date) {
+	db.serialize
 	var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?)');
 		    stmt.run(temp,city,date);
 		    stmt.finalize();
-	db.each('SELECT temp, city, date FROM weather', function(err, row) {
-		      console.log(row.temp, row.city, row.date);
-		  });
+	//db.each('SELECT temp, city, date FROM weather', function(err, row) {
+	//	      console.log(row.temp, row.city, row.date);
+		  //});
 };
 
 function DBclose() { 
