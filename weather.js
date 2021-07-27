@@ -16,8 +16,10 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
 		      console.error(err.message);
 		    }
 	  console.log('Connected to the weatherAPI database.');
-	  db.run("CREATE TABLE weather (temp INT, city TEXT, date INT)");
-	  console.log('Created table - weather.');
+	  db.serialize(() => {
+		          db.run('DROP TABLE IF EXISTS weather');
+		  	  db.run('CREATE TABLE IF NOT EXISTS weather (temp INT, city TEXT, date INT)');
+		          });
 });
 
 // get the api key, city, and url setup for openweathermap (our current data source for temperature)
@@ -43,10 +45,10 @@ request(url, function (err, response, body) {
 });
 
 function DBinsert(temp, city, date) {
-	var stmt = db.prepare("INSERT INTO weather VALUES (?,?,?)");
+	var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?)');
 		    stmt.run(temp,city,date);
 		    stmt.finalize();
-	db.each("SELECT temp, city, date FROM weather", function(err, row) {
+	db.each('SELECT temp, city, date FROM weather', function(err, row) {
 		      console.log(row.temp, row.city, row.date);
 		  });
 };
