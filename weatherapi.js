@@ -18,13 +18,6 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
   console.log('Connected to the weatherAPI database.');
 });
 
-db.close((err) => {
-  if (err) {
-    console.error(err.message);
-  }
-  console.log('Closed the database connection.');
-});
-
 let apiKey = '92170456d98957d0386278d266fe5a9e';
 let city = argv.c || 'portland';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
@@ -38,4 +31,11 @@ request(url, function (err, response, body) {
     console.log(temp);
     console.log(weather);
   }
+});
+
+db.close((err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Closed the database connection.');
 });
