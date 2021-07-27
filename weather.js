@@ -17,7 +17,7 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
 		    }
 	  console.log('Connected to the weatherAPI database.');
 	  db.serialize(() => {
-		          db.run('DROP TABLE IF EXISTS weather');
+//		          db.run('DROP TABLE IF EXISTS weather');
 		  	  db.run('CREATE TABLE IF NOT EXISTS weather (temp INT, city TEXT, date INT)');
 		          });
 });
@@ -27,7 +27,17 @@ let apiKey = '92170456d98957d0386278d266fe5a9e';
 let city = argv.c || 'portland';
 let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
 
-request(url, function (err, response, body) {
+testdate();
+runrequest();
+
+function testdate () {
+	db.each('SELECT temp, city, date FROM weather', function(err, row) {
+        console.log(row.temp, row.city, row.date);
+  });
+};
+
+function runrequest () {
+	request(url, function (err, response, body) {
 	  if(err){
 		      console.log('error:', error);
 		    } else {
@@ -43,6 +53,7 @@ request(url, function (err, response, body) {
 			    	DBclose();
 			      }
 });
+};
 
 function DBinsert(temp, city, date) {
 	var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?)');
