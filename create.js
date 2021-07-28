@@ -20,7 +20,7 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
 		    }
 	  console.log('Connected to the weatherAPI database.');
 	  db.serialize(() => {
-		db.run('CREATE TABLE weather (temp INT, city TEXT, date INT, id INTEGER PRIMARY KEY)');
+		db.run('CREATE TABLE weather (temperature INT, city TEXT, query_time INT, id INTEGER PRIMARY KEY)');
 		db.all("select name from sqlite_master where type='table'", function (err, tables) {
 	        console.log(tables);
 	        });
@@ -35,27 +35,27 @@ function runrequest () {
         console.log('error:', error);
         } else {
                  let weather = JSON.parse(body);
-                 let temp = `${weather.main.temp}` ;
+                 let temperature = `${weather.main.temp}` ;
                  let city = `${weather.name}` ;
-                 var date = new Date();
-                 var ndate = date.toLocaleTimeString();
-                 console.log(temp);
+                 var query_time = new Date();
+                 var ndate = query_time.toLocaleTimeString();
+                 console.log(temperature);
                  console.log(city);
                  console.log(ndate);
-                 console.log(date);
-                 DBinsert(temp, city, date);
+                 console.log(query_time);
+                 DBinsert(temperature, city, query_time);
                  DBclose();
             }
 	});
 };
 
-function DBinsert(temp, city, date) {
+function DBinsert(temperature, city, query_time) {
 	        db.serialize
 	        var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?)');
-	                    stmt.run(temp,city,date);
+	                    stmt.run(temperature,city,query_time);
 	                    stmt.finalize();
-        db.each('SELECT temp, city, date, id FROM weather', function(err, row) {
-	        console.log(row.temp, row.city, row.date, row.id);
+        db.each('SELECT temperature, city, query_time, id FROM weather', function(err, row) {
+	        console.log(row.temperature, row.city, row.query_time, row.id);
 	        });
 	};
 
