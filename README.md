@@ -2,8 +2,8 @@
 A temperature API for NWEA
 
 to setup:
-run drop.js
-run create.js
-run node weather.js -c Detroit
+run node drop.js
+run node create.js
+run node weather.js
 
 
