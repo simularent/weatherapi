@@ -20,7 +20,7 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE | sqlite
 		    }
 	  console.log('Connected to the weatherAPI database.');
 	  db.serialize(() => {
-		db.run('CREATE TABLE weather (temperature INT, city TEXT, query_time INT, id INTEGER PRIMARY KEY)');
+		db.run('CREATE TABLE weather (query_time TEXT, temperature TEXT, city TEXT, compdate INT, id INTEGER PRIMARY KEY)');
 		db.all("select name from sqlite_master where type='table'", function (err, tables) {
 	        console.log(tables);
 	        });
@@ -37,25 +37,25 @@ function runrequest () {
                  let weather = JSON.parse(body);
                  let temperature = `${weather.main.temp}` ;
                  let city = `${weather.name}` ;
-                 var query_time = new Date();
-                 var ndate = query_time.toLocaleTimeString();
+                 var compdate = new Date();
+                 var query_time = compdate.toLocaleTimeString();
                  console.log(temperature);
                  console.log(city);
-                 console.log(ndate);
+                 console.log(compdate);
                  console.log(query_time);
-                 DBinsert(temperature, city, query_time);
+                 DBinsert(query_time, temperature, city, compdate);
                  DBclose();
             }
 	});
 };
 
-function DBinsert(temperature, city, query_time) {
+function DBinsert(query_time, temperature, city, compdate) {
 	        db.serialize
-	        var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?)');
-	                    stmt.run(temperature,city,query_time);
+	        var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?,?)');
+	                    stmt.run(query_time,temperature,city,compdate);
 	                    stmt.finalize();
-        db.each('SELECT temperature, city, query_time, id FROM weather', function(err, row) {
-	        console.log(row.temperature, row.city, row.query_time, row.id);
+        db.each('SELECT compdate, temperature, city, query_time, id FROM weather', function(err, row) {
+	        console.log(row.compdate, row.temperature, row.city, row.query_time, row.id);
 	        });
 	};
 
