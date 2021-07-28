@@ -25,16 +25,16 @@ let db = new sqlite3.Database('./weatherAPI.db', sqlite3.OPEN_READWRITE, (err) =
 // get the api key, city, and url setup for openweathermap (our current data source for temperature)
 let apiKey = '92170456d98957d0386278d266fe5a9e';
 
-// CLI PARAMETER - the city can be overidden here if the admin sees fit, the url parameter "city" can still overide this setting via a web request
-var usercity = argv.c || 'Portland';
-
 // CLI PARAMETER - the debug mode is set here - see comment below
 let debug = argv.m || 'nodebug';
+
+//CLI PARAMETER - show or hide location json data via CLI startup parameter - use 'node weather.js -l show' the default is to hide the location
+var citylocation = argv.l || 'hidden';
 
 // openweathermap URL for external temperature query
 var url = `http://api.openweathermap.org/data/2.5/weather?q=${usercity}&units=imperial&appid=${apiKey}`;
 
-//quick and easy debug on - off switch - use 'node weather.js -c Detroit -m debug' the default is not to activate debug
+//quick and easy debug on - off switch - use 'node weather.js -m debug' the default is no debug
 if (debug === 'nodebug') {
              console.log = function () {};
              }
@@ -63,8 +63,15 @@ app.get('/temperature', (req, res) => {
 				  testdate(usercity);
 			          const result = await resolveAfter1Seconds();
 			          console.log(result);
+		if (citylocation === 'show') {
 				  var sql = "SELECT query_time, temperature, city FROM weather ORDER BY id DESC LIMIT 1"
-			          var params = []
+				  console.log('citylocation = show is true');
+		}
+		else {
+				  var sql = "SELECT query_time, temperature FROM weather ORDER BY id DESC LIMIT 1"
+				  console.log('citylocation = show is false');
+		}
+				  var params = []
 			            db.all(sql, params, (err, rows) => {
 			            	if (err) {
 					res.status(400).json({"error":err.message});
