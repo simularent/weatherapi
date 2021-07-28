@@ -44,7 +44,7 @@ function runrequest () {
                  console.log(compdate);
                  console.log(query_time);
                  DBinsert(query_time, temperature, city, compdate);
-                 DBclose();
+                 //DBclose();
             }
 	});
 };
@@ -52,11 +52,11 @@ function runrequest () {
 function DBinsert(query_time, temperature, city, compdate) {
 	        db.serialize
 	        var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?,?)');
-	                    stmt.run(query_time,temperature,city,compdate);
-	                    stmt.finalize();
-        db.each('SELECT compdate, temperature, city, query_time, id FROM weather', function(err, row) {
-	        console.log(row.compdate, row.temperature, row.city, row.query_time, row.id);
-	        });
+	        stmt.run(query_time,temperature,city,compdate);
+	        stmt.finalize();
+        //db.each('SELECT query_time, temperature, city, compdata, id FROM weather', function(err, row) {
+	        //console.log(row.query_time, row.temperature, row.city, row.compdate, row.id);
+	 //       });
 	};
 
 function DBclose() { 

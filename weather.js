@@ -85,7 +85,7 @@ function testdate (usercity) {
 	db.each('SELECT temperature, city, compdate, id FROM weather ORDER BY id DESC LIMIT 1', function(err, row) {
  	var date = new Date();
 	//data from database
-	console.log("db: " + row.query_time)
+	console.log("db: " + row.compdate)
 	console.log("current date: " + date)
 		
 	var FIVE_MIN=1*30*1000;
@@ -115,7 +115,7 @@ function runrequest (url) {
 			    	console.log(city);
 			    	console.log(compdate);
 			    	console.log(query_time);
-			    	DBinsert(compdate, temperature, city, query_time);
+			    	DBinsert(query_time, temperature, city, compdate);
 	//		    	DBclose();
 			      }
 });
@@ -123,13 +123,13 @@ function runrequest (url) {
 
 // this will insert the data passed to it into the sqlite DB and if debug is enabled, read the data back
 // to the console
-function DBinsert(compdate, temperature, city, query_time) {
+function DBinsert(query_time, temperature, city, compdate) {
 	db.serialize
 	var stmt = db.prepare('INSERT INTO weather VALUES (?,?,?,?,?)');
-		    stmt.run(compdate,temperature,city,query_time);
+		    stmt.run(query_time,temperature,city,compdate);
 		    stmt.finalize();
-	db.each('SELECT compdate, temperature, city, query_time, id FROM weather', function(err, row) {
-		    console.log(row.compdate, row.temperature, row.city, row.query_time, row.id);
+	db.each('SELECT query_time, temperature, city, compdate, id FROM weather', function(err, row) {
+		    console.log(row.query_time, row.temperature, row.city, row.compdate, row.id);
 	});
 };
 
